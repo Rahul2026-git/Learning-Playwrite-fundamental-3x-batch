@@ -77,7 +77,8 @@ Learning-Playwrite-fundamental-3x-batch/
 │   ├── 08_Web_Select_Frames_Iframe/        # Select dropdowns & custom dropdowns
 │   ├── 09_Frame_Iframe/                    # Iframes and nested frames
 │   ├── 10_Keyboard_Hover_Drag_Drop_Calender/ # Hover, keyboard, drag & drop, calendar
-│   └── 11_JS_Alerts/                       # JavaScript alerts / dialogs
+│   ├── 11_JS_Alerts/                       # JavaScript alerts / dialogs
+│   └── 12_Handle_SVG/                      # Locating and interacting with SVG
 ├── Template/
 │   └── Template.spec.ts                    # Starter template for a new test
 ├── Utils/
@@ -105,6 +106,7 @@ roughly in the order the topics are taught.
 | `09_Frame_Iframe` | Switching into iframes and nested frames |
 | `10_Keyboard_Hover_Drag_Drop_Calender` | Hover, keyboard input, drag & drop, date pickers |
 | `11_JS_Alerts` | Handling `alert`, `confirm`, and `prompt` dialogs |
+| `12_Handle_SVG` | Locating and interacting with SVG shapes, chart bars, and map paths |
 
 ## Running Tests
 
