@@ -5,5 +5,6 @@ test('has title', async ({ page }) => {
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/Playwright/);
+  //await page.waitForTimeout(50000); //Wait for long time to see the result in the browser
 });
 
