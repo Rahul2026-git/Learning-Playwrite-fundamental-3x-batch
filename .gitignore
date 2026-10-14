@@ -6,6 +6,9 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 
+# Test downloads (written by the file-download tests)
+/out/
+
 # Allure
 /allure-results/
 /allure-report/

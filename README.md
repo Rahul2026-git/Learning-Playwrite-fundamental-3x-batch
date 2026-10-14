@@ -3,10 +3,11 @@
 A hands-on learning project for **Playwright** with **TypeScript**. It contains the practice
 tests written during the *Playwright Fundamentals* batch — from launching a browser and
 writing your first test, through locator strategies, frames, web tables, drag & drop,
-JavaScript alerts, and SVG handling, to session storage and Allure reporting.
+JavaScript alerts, SVG handling, Shadow DOM, file upload/download, scrolling, `expect`
+assertions and test hooks, to session storage and Allure reporting.
 
-Each module folder is numbered (`01_…` → `12_…`) and each file is prefixed with a lesson
-number (`216_…` → `257_…`) so the suite reads in the order the topics were taught.
+Each module folder is numbered (`01_…` → `18_…`) and each file is prefixed with a lesson
+number (`216_…` → `279_…`) so the suite reads in the order the topics were taught.
 
 ## Table of Contents
 
@@ -78,7 +79,13 @@ Learning-Playwrite-fundamental-3x-batch/
 │   ├── 09_Frame_Iframe/                      # Iframes and nested frames
 │   ├── 10_Keyboard_Hover_Drag_Drop_Calender/ # Keyboard, hover, drag & drop, context menu
 │   ├── 11_JS_Alerts/                         # alert / confirm / prompt dialogs
-│   └── 12_Handle_SVG/                        # Locating and interacting with SVG
+│   ├── 12_Handle_SVG/                        # Locating and interacting with SVG
+│   ├── 13_Shadow_DOM/                        # Piercing shadow roots
+│   ├── 14_FileUpload/                        # Single, multiple & mixed file uploads
+│   ├── 15_File_Download/                     # Capturing downloads
+│   ├── 16_Scroll_toElement/                  # Scrolling & lazy-loaded lists
+│   ├── 17_Expect_Assertions/                 # expect assertions + cheatsheet
+│   └── 18_Test_hooks/                        # Annotations, hooks, steps & cheat docs
 ├── Template/
 │   └── Template.spec.ts                      # Starter template for a new test
 ├── Utils/
@@ -87,6 +94,9 @@ Learning-Playwrite-fundamental-3x-batch/
 ├── package.json
 └── README.md
 ```
+
+> Modules `19-Data_Driven_Testing` through `23_Advance_PW_Framework` exist as **empty
+> placeholder folders** — no tests have been added to them yet, so Git does not track them.
 
 ## What the Tests Cover
 
@@ -191,13 +201,72 @@ Learning-Playwrite-fundamental-3x-batch/
 
 | File | What it demonstrates |
 | ---- | -------------------- |
-| `255_SVG_Practice.spec.ts` | SVG shapes by `#id`, bars via `getByRole('button', …)`, star rating via `getByRole('radio', …)`, and iterating `.bar` attributes |
-| `256_SVG_Project.spec.ts` | Clicking an SVG search icon on Flipkart and reading product titles |
-| `257_Advance_SVG_Project.spec.ts` | XPath with `name()` for namespaced SVG nodes on the SimpleMaps India map |
+| `255_SVG_TestCase.spec.ts` | Flipkart search — fills `input[name="q"]`, clicks the first `svg`, then reads product titles via an XPath predicate on the `data-id` prefixes (`CPU`/`ACC`/`COM`/`MP`) |
+| `256_SVG_Advance_TC.spec.ts` | `app.thetestingacademy.com/…/svg` widget — clicks `#circle-blue` and asserts `#shapes-output` text, `getByRole('button', { name: /Q3 bar/ })`, `getByRole('radio', { name: '4 stars' })`, then iterates `.bar` elements reading `data-quarter`/`height` |
+| `257_SVG_Map_TC_optimizes.ts` | **Script** — iterates `path` elements on the SimpleMaps India map and clicks any whose `class` ends with `UP` |
+| `258_SVG_Map_TC_optimized.spec.ts` | Same SimpleMaps India map logic as `257`, but kept as a collected `.spec.ts` |
 
-> **Note:** Files named `.ts` without `.spec.ts` (`217_multiple_context.ts`, `218_Normal_PW.ts`,
-> `220_BCP.Spec.ts`, `231_Session_Storage.ts`) are standalone scripts run with a TS runner, not
-> collected by the Playwright test runner.
+### 13_Shadow_DOM
+
+| File | What it demonstrates |
+| ---- | -------------------- |
+| `259_shadow_DOM_TC.spec.ts` | Piercing shadow roots with `getByTestId` on the Testing Academy shadow-DOM widget — fills + submits an account card and asserts the status shows the email, increments a counter widget (expects `5`), and fills a **nested** shadow host (`nested-host`, `card-inside-*`) |
+
+### 14_FileUpload
+
+| File | What it demonstrates |
+| ---- | -------------------- |
+| `260_FileUpload_TC.spec.ts` | Uploads `testdata.txt` to `the-internet.herokuapp.com/upload` with `setInputFiles` and asserts `#uploaded-files` contains the name |
+| `261_FileUpload_TC.spec.ts` | Sets a single file on `#single-upload` of the Testing Academy upload/download widget |
+| `262_Multiple_FileUpload_TC_Spec.ts` | Uploads two **in-memory** files (explicit `name`/`mimeType` + `Buffer.from`) to the PatternFly multiple-file-upload |
+| `263_Multiple_FileUpload_Disk_TC.spec.ts` | Uploads `file1.jpg` + `file2.jpg` **from disk** and asserts the dropzone lists both names |
+| `264_Mixed_FileUpload_TC.spec.ts` | Uploads a PDF, JPG and DOC together (mixed MIME types inferred from the extension) |
+| `265_FileUpload_OtherDir_TC.spec.ts` | Same mixed upload, but sourced from a shared directory outside the module (walks up with `..`) |
+
+> Files `testdata.txt`, `file1.jpg` and `file2.jpg` live next to these specs. `264` and `265`
+> reference `sample.pdf`, `sample.jpg` and `sample.doc` from a repo-root `test-data/uploads/`
+> folder, which is **not** part of this repo — create it with those fixtures before running them.
+
+### 15_File_Download
+
+| File | What it demonstrates |
+| ---- | -------------------- |
+| `266_FileDownload_TC.spec.ts` | `Promise.all([page.waitForEvent('download'), click])` on `download-static`, then `download.saveAs('./out/' + suggestedFilename)` |
+
+### 16_Scroll_toElement
+
+| File | What it demonstrates |
+| ---- | -------------------- |
+| `267_Scroll_TC.spec.ts` | Scroll strategies — `locator.scrollIntoViewIfNeeded()`, `window.scrollBy(0, 1000)`, and `window.scrollTo` to bottom then back to top |
+| `268_Lazy_Scroll_TC.spec.ts` | Lazy-loaded list — waits for the initial 10 items, scrolls the loader into view, and uses `expect.poll` to wait until the count grows |
+| `269_Abort_Signal_Scroll_TC.spec.ts` | Same lazy-scroll flow, plus an `AbortController` / `signal` demo that cancels `scrollIntoViewIfNeeded` (the assertion rejects with `aborted`) |
+
+### 17_Expect_Assertions
+
+| File | What it demonstrates |
+| ---- | -------------------- |
+| `270_Expect1.spec.ts` | Value assertions — `toBe`, `toBeFalsy`/`toBeTruthy`, `toBeNull`, `toBeGreaterThan`, and `toEqual` deep equality (order-independent) |
+| `271_Expect2.spec.ts` | Locator assertions — `toBeVisible`, `toContainText`, `toHaveAttribute`, `toHaveCount` (16 footer links) |
+| `272_Expect3.spec.ts` | Soft assertions (`expect.soft`) that keep the test running, followed by hard assertions, plus negation (`.not.toBeVisible`, `not.toContain`) |
+| `273_Expect4.spec.ts` | State assertions — `check()` + `toBeChecked`, `toBeVisible`, `toBeEnabled`, `toHaveTitle`, and a raw `expect(page.url())` check |
+| `Expect_CheatSheet.md` | Reference cheatsheet of the common Playwright `expect` assertions, modifiers and interview Q&A |
+
+### 18_Test_hooks
+
+| File | What it demonstrates |
+| ---- | -------------------- |
+| `274_Test.spec.ts` | Annotations — conditional `test.skip(browserName)`, `test.slow`, `test.fixme`, and `test.fail` |
+| `275_TestHook.spec.md` | `test` API cheatsheet — test functions/modifiers, `describe` variants, hooks & their order, fixtures, `test.info()` and `test.step()` |
+| `276_Test.spec.ts` | Wraps a login flow in `test.step(...)` blocks — open page, assert fields visible, submit and assert the URL ends at `#login-success` |
+| `277_Tk.spec.ts` | Empty placeholder file |
+| `278.td.spec.ts` | `test.describe.serial(...)` ordering versus standalone tests that still run in parallel |
+| `279.ts.spec.ts` | Tagged tests (`@p1 @smoke`) plus `test.describe.configure({ mode: 'serial' })` — run with `--grep @p1` |
+| `Chromium_aRg_List.md` | Reference doc — the Chrome/Chromium command-line arguments that matter in Playwright automation |
+
+> **Note:** Only files ending in a lowercase `.spec.ts` are collected by the runner. Standalone
+> scripts and differently-cased files — `217_multiple_context.ts`, `218_Normal_PW.ts`,
+> `220_BCP.Spec.ts`, `231_Session_Storage.ts`, and `257_SVG_Map_TC_optimizes.ts` — are run
+> directly with a TS runner and are **not** picked up by `npx playwright test`.
 
 ## Running Tests
 
@@ -214,10 +283,11 @@ npx playwright test tests/07_WebTables
 npx playwright test tests/03_Locator_Commands/230_getByRole.spec.ts
 ```
 
-Filter by title, run headed, or pick a project:
+Filter by title, tag, run headed, or pick a project:
 
 ```bash
 npx playwright test -g "Login Page"
+npx playwright test --grep @p1
 npx playwright test --headed
 npx playwright test --project=chromium
 npx playwright test --ui
@@ -244,7 +314,8 @@ Step through a test with the Playwright Inspector:
 npx playwright test --debug
 ```
 
-Or pause at a specific line with `await page.pause();`.
+Or pause at a specific line with `await page.pause();` — several of the newer specs already
+call it so you can inspect the page mid-run.
 
 ## Allure Reporting
 
@@ -292,12 +363,12 @@ Key settings in `playwright.config.ts`:
 | --------------- | ------------------------------------------------ |
 | `testDir`       | `./tests`                                        |
 | `fullyParallel` | `true`                                           |
-| `reporter`      | `line` + `allure-playwright`                     |
-| `retries`       | `2` on CI, `0` locally                           |
-| `workers`       | `1` on CI, default locally                       |
-| `use.headless`  | `false` (browser visible locally)                |
-| `use.trace`     | `on-first-retry`                                 |
-| `projects`      | `chromium` (Desktop Chrome)                      |
+| `reporter`      | `line` + `allure-playwright`                      |
+| `retries`       | `2` on CI, `0` locally                            |
+| `workers`       | `1` on CI, default locally                        |
+| `use.headless`  | `false` (browser visible locally)                 |
+| `use.trace`     | `on-first-retry`                                  |
+| `projects`      | `chromium` (Desktop Chrome)                       |
 
 ## Author
 
