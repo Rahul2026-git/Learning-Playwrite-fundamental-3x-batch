@@ -9,10 +9,15 @@
   "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "@playwright/test": "^1.63.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^26.5.1",
     "allure-commandline": "^2.46.1",
-    "allure-playwright": "^3.13.0"
+    "allure-playwright": "^3.13.0",
+    "exceljs": "^4.4.0",
+    "js-yaml": "^5.4.3",
+    "mysql2": "^3.24.6"
   },
   "dependencies": {
     "dotenv": "^18.0.5",
