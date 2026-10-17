@@ -5,10 +5,10 @@ tests written during the *Playwright Fundamentals* batch — from launching a br
 writing your first test, through locator strategies, frames, web tables, drag & drop,
 JavaScript alerts, SVG handling, Shadow DOM, file upload/download, scrolling, `expect`
 assertions and test hooks, to session storage, Allure reporting and data-driven testing
-(CSV, JSON, Excel, YAML, MySQL and Faker).
+(CSV, JSON, Excel, YAML, MySQL and Faker), ending with the Page Object Model.
 
-Each module folder is numbered (`01_…` → `19_…`) and each file is prefixed with a lesson
-number (`216_…` → `290_…`) so the suite reads in the order the topics were taught.
+Each module folder is numbered (`01_…` → `20_…`) and each file is prefixed with a lesson
+number (`216_…` → `294_…`) so the suite reads in the order the topics were taught.
 
 ## Table of Contents
 
@@ -87,7 +87,8 @@ Learning-Playwrite-fundamental-3x-batch/
 │   ├── 16_Scroll_toElement/                  # Scrolling & lazy-loaded lists
 │   ├── 17_Expect_Assertions/                 # expect assertions + cheatsheet
 │   ├── 18_Test_hooks/                        # Annotations, hooks, steps & cheat docs
-│   └── 19_Data_Driven_Testing/               # DDT from CSV, JSON, Excel, YAML, MySQL, Faker
+│   ├── 19_Data_Driven_Testing/               # DDT from CSV, JSON, Excel, YAML, MySQL, Faker
+│   └── 20_Page_Object_Model/                 # Page objects for the TTACart login/cart flow
 ├── Template/
 │   └── Template.spec.ts                      # Starter template for a new test
 ├── Utils/
@@ -97,7 +98,7 @@ Learning-Playwrite-fundamental-3x-batch/
 └── README.md
 ```
 
-> Modules `20_…` through `23_Advance_PW_Framework` exist as **empty placeholder folders** — no
+> Modules `21_…` through `23_Advance_PW_Framework` exist as **empty placeholder folders** — no
 > tests have been added to them yet, so Git does not track them.
 
 ## What the Tests Cover
@@ -321,6 +322,29 @@ node tests/19-Data_Driven_Testing/util/generateExcel.js
 > scripts and differently-cased files — `217_multiple_context.ts`, `218_Normal_PW.ts`,
 > `220_BCP.Spec.ts`, `231_Session_Storage.ts`, and `257_SVG_Map_TC_optimizes.ts` — are run
 > directly with a TS runner and are **not** picked up by `npx playwright test`.
+
+### 20_Page_Object_Model
+
+The **Page Object Model** against the TTACart practice app
+(`app.thetestingacademy.com/playwright/ttacart/`). `291` shows the raw flow, `292`/`293`
+refactor it behind page objects, and `294` measures why a page object can be as large as a
+screen without costing anything.
+
+| File | What it demonstrates |
+| ---- | -------------------- |
+| `291_No_POM.spec.ts` | The login flow written **without** POM — locators and actions inline in the test, as the baseline |
+| `292_POM.spec.ts` | The same login refactored into `LoginPage` (`goto()` + `login(user, pass)`) |
+| `293_POM.spec.ts` | Full POM journey — `LoginPage` → `InventoryPage` adds the first product → open the cart → `Cartpage` asserts the cart holds that product |
+| `294_heavy_Page.spec.ts` | Why locators are cheap — builds a 100-locator `HeavyPage` and asserts construction is fast and methods live on the prototype |
+| `Pages/Loginpage.ts` | `LoginPage` — Username/Password fields, `[data-test="login-button"]`, plus `goto()` and `login()` |
+| `Pages/inventoryPage.ts` | `InventoryPage` — product name, `add-to-cart*` button and cart icon locators; `goto()` |
+| `Pages/CartPage.ts` | `Cartpage` — cart title/name/price/checkout locators built through a `[data-test="…"]` helper |
+| `Pages/HeavyPage.ts` | `HeavyPage` — a deliberately oversized page object (100 locators, 110+ methods) proving locators are lazy and methods are shared |
+
+> TTACart tags elements with `data-test`, not Playwright's default `data-testid`, so the page
+> objects select `[data-test="…"]` (or set `testIdAttribute: 'data-test'` in the config). The
+> specs import the page objects as `./Pages/…`; on case-sensitive filesystems make the import
+> path match the file name exactly (`Loginpage.ts`, `inventoryPage.ts`).
 
 ## Running Tests
 
